@@ -32,9 +32,9 @@ PronunciationGuide guides;
 #### `AnswerText`
 ```c
 string      raw;
-u8          nCorrect;
+u8          nCorrects;
 Range<u8>[] correct; // usually things that are bolded
-u8          nPrompt;
+u8          nPrompts;
 Range<u8>[] prompt; // usually things that are underlined
 ```
 
@@ -55,7 +55,7 @@ determined by the `packetCount` field in the header.
 ```c
 u8      packetNumber;
 string  descriptor; // "Finals", etc.
-u8      cycleCount;
+u8      nCycles;
 Cycle[] cyles;
 ```
 
