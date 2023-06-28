@@ -39,14 +39,61 @@ u8          nPrompts;
 Range<u8>[] prompt; // usually things that are underlined
 ```
 
+#### `Category`
+General and more specific categories are not seperate, as usually it is pretty
+obvious what a subcategory falls into generally. It is up to implementers to
+notice this.
+
+It's a `u8` enum, taken from qbreader.
+
+```c
+AMERICAN_LIT = 0,
+BRITISH_LIT,
+CLASSICAL_LIT,
+EURO_LIT,
+WORLD_LIT,
+OTHER_LIT,
+AMERICAN_HIST,
+ANCIENT_HIST,
+EURO_HIST,
+WORLD_HIST,
+OTHER_HIST,
+BIOLOGY,
+CHEMISTRY,
+PHYSICS,
+MATH,
+EARTH_SCI,
+COMPUTER_SCI,
+OTHER_SCI,
+VISUAL_FA,
+AUDITORY_FA,
+OTHER_FA,
+RELIGION,
+MYTHOLOGY,
+PHILOSPHY,
+SOCIAL_SCIENCE,
+OTHER_RMPSS,
+GEOGRAPHY,
+OTHER,
+TRASH
+```
 ## Header
 The file will begin with a header containing basic information about the packet.
+
+Custom categories are an array of string, category tuples for categories that
+are not included in the format. They are each the name of the category then the
+category for the other section of the broader category. For example, psycology
+would be `("Psychology", OTHER_SCI)`. They are referenced in questions as the
+index into `customCategories` plus the number of included categories.
+
 ```c
 char[6]   fileMagic; // always "QbSet\0"
 string    setName;
 u16       setYear;
 u8        packetCount;
 u8        fileVersion; // Currently 0
+u8        nCustomCategories;
+(string, Category)[] customCategories;
 Packet[]  packets;
 ```
 
@@ -81,14 +128,17 @@ A tossup consists of one question and one answer.
 u16          powerMark; // The index of the first char out of power. 0 if no power.
 u16          secondPm; // This field will not be included if powerMark is 0.
 QuestionText question;
+Category     category;
 AnswerText   answer;
 ```
 
 ## Bonus
-A bonus contains a leadin, and 3 question-answer pairs.
+A bonus contains a leadin, and some amount question-answer pairs.
 ```c
 QuestionText leadin;
 u8           partCount;
+u8           value; // usually 10, but you never know
+Category     category;
 BonusPart[]  parts;
 ```
 #### `BonusPart`
