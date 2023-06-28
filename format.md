@@ -136,13 +136,13 @@ AnswerText   answer;
 A bonus contains a leadin, and some amount question-answer pairs.
 ```c
 QuestionText leadin;
-u8           partCount;
-u8           value; // usually 10, but you never know
 Category     category;
+u8           partCount;
 BonusPart[]  parts;
 ```
 #### `BonusPart`
 ```c
+u8           value; // usually 10, but you never know
 QuestionText text;
-AnswerText answer;
+AnswerText   answer;
 ```
