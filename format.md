@@ -17,7 +17,7 @@ T start;
 T end;
 ```
 
-#### `PronunciationGuide`
+#### `PronounceGuide`
 ```c
 string     guide;
 Range<u16> word; // char index of start and end of thing being guided
@@ -25,8 +25,9 @@ Range<u16> word; // char index of start and end of thing being guided
 
 #### `QuestionText`
 ```c
-string             raw; // this does not contain any pronunciation guides
-PronunciationGuide guides;
+string           raw; // this does not contain any pronunciation guides
+u8               nGuides;
+PronounceGuide[] guides;
 ```
 
 #### `AnswerText`
