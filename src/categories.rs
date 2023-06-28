@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Category {
     Subcategory(Subcategory),
     Custom(u8),
@@ -16,14 +16,22 @@ impl Category {
         if let Ok(subcategory) = Subcategory::try_from(index) {
             Ok(Category::Subcategory(subcategory))
         } else {
-            Ok(Category::Custom(index - Subcategory::VARIANTS + 1))
+            Ok(Category::Custom(index - Subcategory::VARIANTS))
         }
+    }
+
+    pub(crate) fn write_to<W: Write>(&self, mut writer: W) -> Result<()> {
+        match self {
+            Category::Custom(i) => writer.write_u8(*i + Subcategory::VARIANTS)?,
+            Category::Subcategory(i) => writer.write_u8(*i as u8)?,
+        }
+        Ok(())
     }
 }
 
 /// A general category of a tossup or bonus. This gives the general idea of what a
 /// question is about vs the more specific `Subcategory`.
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum BroadCategory {
     Literature,
     History,
@@ -36,15 +44,31 @@ pub enum BroadCategory {
     Trash,
 }
 
+impl BroadCategory {
+    pub fn as_subcat_other(&self) -> Subcategory {
+        use BroadCategory::*;
+        match *self {
+            Literature => Subcategory::OtherLit,
+            History => Subcategory::OtherHist,
+            Arts => Subcategory::OtherFineArts,
+            Rmpss => Subcategory::OtherRmpss,
+            Geography => Subcategory::Geography,
+            Other => Subcategory::OtherAcademic,
+            Trash => Subcategory::Trash,
+            Science => Subcategory::OtherSci,
+        }
+    }
+}
+
 /// A set's custom category.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct CustomCategory {
     pub name: String,
     pub general: BroadCategory,
 }
 
 /// The more specific category for a Bonus/Tossup
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 #[repr(u8)]
 pub enum Subcategory {
     AmericanLit = 0,
@@ -81,7 +105,7 @@ pub enum Subcategory {
 }
 
 impl Subcategory {
-    const VARIANTS: u8 = 30;
+    const VARIANTS: u8 = 31;
 
     /// What broad category does this fall under?
     pub fn broad_category(&self) -> BroadCategory {

@@ -90,10 +90,10 @@ index into `customCategories` plus the number of included categories.
 char[6]   fileMagic; // always "QbSet\0"
 string    setName;
 u16       setYear;
-u8        packetCount;
 u8        fileVersion; // Currently 0
 u8        nCustomCategories;
 (string, Category)[] customCategories;
+u8        nPackets;
 Packet[]  packets;
 ```
 
@@ -128,8 +128,8 @@ A tossup consists of one question and one answer.
 u16          powerMark; // The index of the first char out of power. 0 if no power.
 u16          secondPm; // This field will not be included if powerMark is 0.
 QuestionText question;
-Category     category;
 AnswerText   answer;
+Category     category;
 ```
 
 ## Bonus

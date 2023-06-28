@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use std::io::Read;
+use std::io::{Read, Write};
 use thiserror::Error;
 
 mod categories;
@@ -44,8 +44,22 @@ trait ReadHelpers: Read {
 }
 impl<T> ReadHelpers for T where T: Read {}
 
+trait WriteHelpers: Write {
+    fn write_string(&mut self, str: &str) -> std::io::Result<()> {
+        self.write_u16(str.len() as u16)?;
+        self.write_all(str.as_bytes())
+    }
+    fn write_u16(&mut self, num: u16) -> std::io::Result<()> {
+        self.write_all(&num.to_le_bytes())
+    }
+    fn write_u8(&mut self, num: u8) -> std::io::Result<()> {
+        self.write_all(&[num])
+    }
+}
+impl<T> WriteHelpers for T where T: Write {}
+
 /// A quizbowl set that contains one or more packets.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Set {
     pub name: String,
     pub year: u16,
@@ -70,7 +84,6 @@ impl Set {
         }
         let name = reader.read_string()?;
         let year = reader.read_u16()?;
-        let packets_len = reader.read_u8()? as usize;
         let file_version = reader.read_u8()?;
 
         let custom_cats_len = reader.read_u8()? as usize;
@@ -81,6 +94,7 @@ impl Set {
             custom_categories.push(CustomCategory { name, general });
         }
 
+        let packets_len = reader.read_u8()? as usize;
         let mut packets = Vec::with_capacity(packets_len);
         for _ in 0..packets_len {
             packets.push(Packet::read_from(&mut reader)?);
@@ -89,5 +103,23 @@ impl Set {
         Ok(Self {
             name, year, custom_categories, packets
         })
+    }
+
+    /// Write the file out to a Writer
+    pub fn write_to<W: Write>(&self, mut writer: W) -> Result<()> {
+        // write the file magic
+        writer.write(b"QbSet\0")?;
+        writer.write_string(&self.name)?;
+        writer.write_u16(self.year)?;
+        writer.write_u8(self.custom_categories.len() as u8)?;
+        for custom in &self.custom_categories {
+            writer.write_string(&custom.name)?;
+            writer.write_u8(custom.general.as_subcat_other() as u8)?;
+        }
+        writer.write_u8(self.packets.len() as u8);
+        for packet in &self.packets {
+            packet.write_to(&mut writer)?;
+        }
+        Ok(())
     }
 }
