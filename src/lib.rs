@@ -101,7 +101,10 @@ impl Set {
         }
 
         Ok(Self {
-            name, year, custom_categories, packets
+            name,
+            year,
+            custom_categories,
+            packets,
         })
     }
 

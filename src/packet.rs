@@ -44,12 +44,12 @@ impl Packet {
             } else {
                 None
             };
-            cycles.push(Cycle {
-                tossup, bonus
-            });
+            cycles.push(Cycle { tossup, bonus });
         }
         Ok(Packet {
-            cycles, description, number
+            cycles,
+            description,
+            number,
         })
     }
 
@@ -59,8 +59,12 @@ impl Packet {
         writer.write_u8(self.cycles.len() as u8)?;
         for cycle in &self.cycles {
             let mut flags: u8 = 0;
-            if cycle.tossup.is_some() { flags |= 1 << 1 }
-            if cycle.bonus.is_some() { flags |= 1 }
+            if cycle.tossup.is_some() {
+                flags |= 1 << 1
+            }
+            if cycle.bonus.is_some() {
+                flags |= 1
+            }
             writer.write_u8(flags)?;
             if let Some(ref tossup) = cycle.tossup {
                 tossup.write_to(&mut writer)?;
@@ -73,7 +77,7 @@ impl Packet {
     }
 }
 
-/// A pronunciation guide 
+/// A pronunciation guide
 #[derive(Clone, PartialEq, Debug)]
 pub struct PronunciationGuide {
     /// The guide itself
@@ -101,9 +105,7 @@ impl QuestionText {
             let range = start..end;
             guides.push(PronunciationGuide { guide, range });
         }
-        Ok(Self {
-            raw, guides
-        })
+        Ok(Self { raw, guides })
     }
 
     pub(crate) fn write_to<W: Write>(&self, mut writer: W) -> Result<()> {
@@ -145,10 +147,11 @@ impl AnswerText {
         }
 
         Ok(Self {
-            raw, correct, prompt
+            raw,
+            correct,
+            prompt,
         })
     }
-
 
     pub(crate) fn write_to<W: Write>(&self, mut writer: W) -> Result<()> {
         writer.write_string(&self.raw)?;
@@ -199,7 +202,11 @@ impl Tossup {
         let answer = AnswerText::read_from(&mut reader)?;
         let category = Category::read_from(&mut reader)?;
         Ok(Self {
-            powermark, second_powermark, question, answer, category
+            powermark,
+            second_powermark,
+            question,
+            answer,
+            category,
         })
     }
 
@@ -241,9 +248,17 @@ impl Bonus {
             let value = reader.read_u8()?;
             let text = QuestionText::read_from(&mut reader)?;
             let answer = AnswerText::read_from(&mut reader)?;
-            parts.push(BonusPart { value, text, answer });
+            parts.push(BonusPart {
+                value,
+                text,
+                answer,
+            });
         }
-        Ok(Self { leadin, category, parts })
+        Ok(Self {
+            leadin,
+            category,
+            parts,
+        })
     }
 
     pub(crate) fn write_to<W: Write>(&self, mut writer: W) -> Result<()> {

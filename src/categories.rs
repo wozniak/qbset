@@ -117,9 +117,8 @@ impl Subcategory {
             AmericanHist | AncientHist | EuropeanHist | WorldHist | OtherHist => {
                 BroadCategory::History
             }
-            Biology | Chemistry | Math | Physics | Astronomy | EarthSci | ComputerSci | OtherSci => {
-                BroadCategory::Science
-            }
+            Biology | Chemistry | Math | Physics | Astronomy | EarthSci | ComputerSci
+            | OtherSci => BroadCategory::Science,
             VisualFineArts | AuditoryFineArts | OtherFineArts => BroadCategory::Arts,
             Religion | Mythology | Philosophy | SocialScience | OtherRmpss => BroadCategory::Rmpss,
             Geography => BroadCategory::Geography,
